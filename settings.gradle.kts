@@ -15,6 +15,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Chitralaya"
+rootProject.name = "Photogram"
 include(":app")
  

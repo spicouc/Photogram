@@ -1,6 +1,6 @@
 <resources>
     <!-- Non translatable -->
-    <string name="app_name" translatable="false">Chitralaya</string>
+    <string name="app_name" translatable="false">Photogram</string>
     <string name="upload_single" translatable="false">upload-single</string>
     <string name="enabled_periodic_backup" translatable="false">enabled-periodic-backup</string>
     <string name="disabled_periodic_backup" translatable="false">disabled-periodic-backup</string>
@@ -63,9 +63,9 @@
     <string name="import_export"><![CDATA[Import & Export]]></string>
     <string name="import_database">Import database</string>
     <string name="export_database">Export database</string>
-    <string name="CloudGallery_photos_backup_json">CloudGallery_photos_backup.json</string>
+    <string name="CloudGallery_photos_backup_json">Photogram_photos_backup.json</string>
     <string name="auto_export_database">Auto export database</string>
-    <string name="CloudGallery_auto_photos_backup_json">CloudGallery_auto_photos_backup.json</string>
+    <string name="CloudGallery_auto_photos_backup_json">Photogram_auto_photos_backup.json</string>
     <string name="periodic_database_export_cancelled">Periodic database export cancelled.</string>
     <string name="auto_export_interval">Auto export interval</string>
     <string name="menu_icon">Menu icon</string>
@@ -92,8 +92,8 @@
     <string name="_4_copy_and_paste_the_unique_id_here">4. Copy and paste the unique id here.</string>
     <string name="invalid_uid_or_token">Invalid UID or token.</string>
     <string name="unique_id_start_in_gc">Enter unique id</string>
-    <string name="download_CloudGallery">Download/CloudGallery</string>
-    <string name="CloudGallery">CloudGallery_%1$s.%2$s</string>
+    <string name="download_CloudGallery">Download/Photogram</string>
+    <string name="CloudGallery">Photogram_%1$s.%2$s</string>
     <string name="photo_upload_successful">Photo upload successful!</string>
     <string name="uploading_photo">Uploading photo</string>
     <string name="exporting_database">Exporting database</string>
@@ -116,17 +116,17 @@
     <string name="cancel">Cancel</string>
 
     <!-- Enhanced Disclaimer Screen -->
-    <string name="disclaimer_title">Welcome to CloudGallery</string>
+    <string name="disclaimer_title">Welcome to Photogram</string>
     <string name="disclaimer_subtitle">Your Privacy-First Photo Backup Solution</string>
     <string name="i_acknowledge">I Acknowledge</string>
 
     <!-- Privacy Policy Section -->
     <string name="privacy_policy_title">Privacy &amp; Data Handling</string>
-    <string name="privacy_policy_content">CloudGallery is designed with your privacy as the top priority:\n\n• No telemetry, analytics, or tracking\n• No third-party data sharing\n• Direct communication only with YOUR Telegram bot\n• All sensitive data encrypted locally using AES-256\n• You maintain complete control over your data\n• Open source and fully auditable</string>
+    <string name="privacy_policy_content">Photogram is designed with your privacy as the top priority:\n\n• No telemetry, analytics, or tracking\n• No third-party data sharing\n• Direct communication only with YOUR Telegram bot\n• All sensitive data encrypted locally using AES-256\n• You maintain complete control over your data\n• Open source and fully auditable</string>
 
     <!-- User Responsibilities Section -->
     <string name="user_responsibilities_title">Your Responsibilities</string>
-    <string name="user_responsibilities_content">By using CloudGallery, you acknowledge:\n\n• You are responsible for creating and managing your Telegram bot\n• You must secure your bot token and keep it confidential\n• You understand Telegram\'s terms of service apply to your bot usage\n• You will not use this app for spam or malicious activities\n• You are responsible for backing up your bot configuration</string>
+    <string name="user_responsibilities_content">By using Photogram, you acknowledge:\n\n• You are responsible for creating and managing your Telegram bot\n• You must secure your bot token and keep it confidential\n• You understand Telegram\'s terms of service apply to your bot usage\n• You will not use this app for spam or malicious activities\n• You are responsible for backing up your bot configuration</string>
 
     <!-- App Limitations Section -->
     <string name="app_limitations_title">App Limitations</string>
@@ -134,7 +134,7 @@
 
     <!-- Telegram Bot Requirements Section -->
     <string name="telegram_requirements_title">Telegram Bot Requirements</string>
-    <string name="telegram_requirements_content">To use CloudGallery, you need:\n\n• A Telegram account\n• A bot created through @BotFather\n• A private group or channel for photo storage\n• Your bot added to the group with admin permissions\n• Basic understanding of Telegram bot setup process</string>
+    <string name="telegram_requirements_content">To use Photogram, you need:\n\n• A Telegram account\n• A bot created through @BotFather\n• A private group or channel for photo storage\n• Your bot added to the group with admin permissions\n• Basic understanding of Telegram bot setup process</string>
 
     <!-- Terms of Use Section -->
     <string name="terms_of_use_title">Terms of Use</string>
@@ -160,12 +160,12 @@
     <string name="hide_password">Hide token</string>
     <string name="continue_button">Continue</string>
     <string name="setup_complete">Setup Complete!</string>
-    <string name="welcome_message">Welcome to CloudGallery! Your bot is now configured and ready to backup your photos securely.</string>
+    <string name="welcome_message">Welcome to Photogram! Your bot is now configured and ready to backup your photos securely.</string>
 
     <!-- Accessibility Content Descriptions -->
     <string name="disclaimer_screen_content">Disclaimer and privacy information screen</string>
     <string name="getting_started_screen_content">Bot setup and configuration screen</string>
-    <string name="app_logo_description">CloudGallery application logo</string>
+    <string name="app_logo_description">Photogram application logo</string>
     <string name="step_indicator_description">Setup step %1$d of 4</string>
     <string name="configuration_section_description">Bot configuration input section</string>
     <string name="instructions_section_description">Step-by-step setup instructions</string>

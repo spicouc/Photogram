@@ -182,7 +182,7 @@ fun GettingStartedScreen(
                 details = listOf(
                     "Send /newbot to @BotFather",
                     "Choose a name for your bot (e.g., 'Cloud Gallery Bot')",
-                    "Choose a username ending in 'bot' (e.g., 'cloudgallery_bot')",
+                    "Choose a username ending in 'bot' (e.g., 'photogram_bot')",
                     "Copy the bot token that BotFather gives you"
                 ),
                 isActive = currentStep >= 1

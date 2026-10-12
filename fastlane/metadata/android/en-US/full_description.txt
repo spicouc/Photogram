@@ -1,9 +1,9 @@
 Never Lose a Precious Memory Again! 📸✨
 
-Chitralaya CloudGallery (चित्रालय - "House of Images" in Sanskrit) is your personal photo fortress that transforms Telegram into unlimited, truly private cloud storage! Say goodbye to the anxiety of losing precious memories and hello to unlimited backup freedom.
+Photogram is your personal photo fortress that transforms Telegram into unlimited, truly private cloud storage! Say goodbye to the anxiety of losing precious memories and hello to unlimited backup freedom.
 
-🌟 What is CloudGallery?
-Chitralaya CloudGallery is a simple open-source Android app
+🌟 What is Photogram?
+Photogram is a simple open-source Android app
 that turns your Telegram account into a private photo cloud storage — no signup, no servers, no tracking.
 
 Your photos go straight from your phone to your own Telegram chat,
@@ -19,7 +19,7 @@ Before you scroll, let me make one thing clear —
 I’m just another user like you, tired of the usual “cloud storage deal” — free at first,
 then you pay with your money... or even worse, with your privacy.
 
-So I built something different — Chitralaya CloudGallery.
+So I built something different — Photogram.
 
 It’s not a company, not a service.
 Just a simple, open-source tool —
@@ -75,7 +75,7 @@ than Google(Google, which builds entire business models around data.).
 Still, it’s your call. I’m not here to sell you Telegram. I’m just here to hand you the option.
 
 🛡️ Transparency First
-I don’t want you to blindly trust me either. Here’s how CloudGallery works:
+I don’t want you to blindly trust me either. Here’s how Photogram works:
 
 Your bot token & chat ID are stored securely in Android keystore (AES encryption).
 Your photos go directly to your Telegram account — no middle servers.
@@ -85,7 +85,7 @@ Now, let me be fully transparent about limitations too:
 
 Bot API has quirks → it can’t read your old messages without chat IDs.
 That means if you reinstall the app fresh, you won’t automatically see your past uploads.
-To fix that, CloudGallery keeps a local JSON database of synced images.
+To fix that, Photogram keeps a local JSON database of synced images.
 This JSON file is also backed up to your Telegram so you can re-import it on another phone.
 But warning ⚠️: This database is plain text (readable JSON), not encrypted. If you leak it, others can read metadata. Keep it safe. That’s your responsibility.
 
@@ -106,6 +106,6 @@ Only available on Android; you can still access your images by login in to Teleg
 
 UI/UX is functional but not as polished or feature-rich as Google Photos, iCloud, or other commercial cloud apps.
 
-In short: CloudGallery is a privacy-first, direct backup tool to Telegram.
+In short: Photogram is a privacy-first, direct backup tool to Telegram.
 
 It’s not a full-featured cloud platform yet, but it gives you control over your photos and the ability to build on it with community support.

@@ -1,8 +1,8 @@
 <!-- ---------- Header ---------- -->
 <div align="center">
   <img src="app/src/main/res/drawable/chitralaya.png" width="200" height="200">
-  <h1>Chitralaya CloudGallery</h1>
-  <h4><em>"Chitralaya" ((चित्रालय)) = "House of Images" in Sanskrit</em></h4>
+  <h1>Photogram</h1>
+  <h4><em>"Photogram" = "Photo Message"</em></h4>
   <h3>🚀 Your Personal Photo Vault with Unlimited Cloud Storage</h3>
   <p><strong>Transform Telegram into your private, unlimited photo backup solution!</strong></p>
   <p>🔒 <em>100% Private • No Telemetry • Your Data, Your Control</em></p>
@@ -11,25 +11,25 @@
   <div align="center">
     <!-- <img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square"> -->
     <!-- <img alt="Downloads" src="https://img.shields.io/github/downloads/AKS-Labs/CloudGallery/total?color=c3e7ff&style=flat-square"> -->
-    <img alt="Last commit" src="https://img.shields.io/github/last-commit/AKS-Labs/CloudGallery?color=c3e7ff&style=flat-square">
-    <img alt="Repo size" src="https://img.shields.io/github/repo-size/AKS-Labs/CloudGallery?color=c3e7ff&style=flat-square">
+    <img alt="Last commit" src="https://img.shields.io/github/last-commit/spicouc/Photogram?color=c3e7ff&style=flat-square">
+    <img alt="Repo size" src="https://img.shields.io/github/repo-size/spicouc/Photogram?color=c3e7ff&style=flat-square">
     <!-- <img alt="Stars" src="https://img.shields.io/github/stars/AKS-Labs/CloudGallery?color=c3e7ff&style=flat-square"> -->
     <br>
 
       
-  <img src="https://hits.sh/github.com/AKS-Labs/CloudGallery.svg?style=for-the-badge&label=Page%20Views&extraCount=2000&color=ff3f6f&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJzdmctaWNvbiIgc3R5bGU9IndpZHRoOiAxZW07IGhlaWdodDogMWVtO3ZlcnRpY2FsLWFsaWduOiBtaWRkbGU7ZmlsbDojZmZmZmZmO292ZXJmbG93OiBoaWRkZW47IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiPjxwYXRoIGQ9Ik01MTIgMzg0YTEyOCAxMjggMCAwIDAtMTI4IDEyOCAxMjggMTI4IDAgMCAwIDEyOCAxMjggMTI4IDEyOCAwIDAgMCAxMjgtMTI4IDEyOCAxMjggMCAwIDAtMTI4LTEyOG0wIDM0MS4zMzMzMzNhMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDAgMCAxLTIxMy4zMzMzMzMtMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDIxMy4zMzMzMzMgMCAwIDEgMjEzLjMzMzMzMy0yMTMuMzMzMzMzIDIxMy4zMzMzMzMgMjEzLjMzMzMzMyAwIDAgMSAyMTMuMzMzMzMzIDIxMy4zMzMzMzMgMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDAgMCAxLTIxMy4zMzMzMzMgMjEzLjMzMzMzM20wLTUzMy4zMzMzMzNDMjk4LjY2NjY2NyAxOTIgMTE2LjQ4IDMyNC42OTMzMzMgNDIuNjY2NjY3IDUxMmM3My44MTMzMzMgMTg3LjMwNjY2NyAyNTYgMzIwIDQ2OS4zMzMzMzMgMzIwczM5NS41Mi0xMzIuNjkzMzMzIDQ2OS4zMzMzMzMtMzIwYy03My44MTMzMzMtMTg3LjMwNjY2Ny0yNTYtMzIwLTQ2OS4zMzMzMzMtMzIweiIgZmlsbD0iIi8%2BPC9zdmc%2B&labelColor=870b2a"/>
+  <img src="https://hits.sh/github.com/spicouc/Photogram.svg?style=for-the-badge&label=Page%20Views&extraCount=2000&color=ff3f6f&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJzdmctaWNvbiIgc3R5bGU9IndpZHRoOiAxZW07IGhlaWdodDogMWVtO3ZlcnRpY2FsLWFsaWduOiBtaWRkbGU7ZmlsbDojZmZmZmZmO292ZXJmbG93OiBoaWRkZW47IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiPjxwYXRoIGQ9Ik01MTIgMzg0YTEyOCAxMjggMCAwIDAtMTI4IDEyOCAxMjggMTI4IDAgMCAwIDEyOCAxMjggMTI4IDEyOCAwIDAgMCAxMjgtMTI4IDEyOCAxMjggMCAwIDAtMTI4LTEyOG0wIDM0MS4zMzMzMzNhMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDAgMCAxLTIxMy4zMzMzMzMtMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDIxMy4zMzMzMzMgMCAwIDEgMjEzLjMzMzMzMy0yMTMuMzMzMzMzIDIxMy4zMzMzMzMgMjEzLjMzMzMzMyAwIDAgMSAyMTMuMzMzMzMzIDIxMy4zMzMzMzMgMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDAgMCAxLTIxMy4zMzMzMzMgMjEzLjMzMzMzM20wLTUzMy4zMzMzMzNDMjk4LjY2NjY2NyAxOTIgMTE2LjQ4IDMyNC42OTMzMzMgNDIuNjY2NjY3IDUxMmM3My44MTMzMzMgMTg3LjMwNjY2NyAyNTYgMzIwIDQ2OS4zMzMzMzMgMzIwczM5NS41Mi0xMzIuNjkzMzMzIDQ2OS4zMzMzMzMtMzIwYy03My44MTMzMzMtMTg3LjMwNjY2Ny0yNTYtMzIwLTQ2OS4zMzMzMzMtMzIweiIgZmlsbD0iIi8%2BPC9zdmc%2B&labelColor=870b2a"/>
   
 
   
-<a href="https://github.com/AKS-Labs/CloudGallery/releases">
+<a href="https://github.com/spicouc/Photogram/releases">
   
-  <img src="https://img.shields.io/github/downloads/AKS-Labs/CloudGallery/total?color=ff9500&style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRpdGxlPmRvd25sb2FkPC90aXRsZT48cGF0aCBkPSJNNSwyMEgxOVYxOEg1TTE5LDlIMTVWM0g5VjlINUwxMiwxNkwxOSw5WiIgZmlsbD0id2hpdGUiIC8+PC9zdmc+&labelColor=a6660d"/>
+  <img src="https://img.shields.io/github/downloads/spicouc/Photogram/total?color=ff9500&style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRpdGxlPmRvd25sb2FkPC90aXRsZT48cGF0aCBkPSJNNSwyMEgxOVYxOEg1TTE5LDlIMTVWM0g5VjlINUwxMiwxNkwxOSw5WiIgZmlsbD0id2hpdGUiIC8+PC9zdmc+&labelColor=a6660d"/>
   
 </a>
   
-<a href="https://github.com/AKS-Labs/CloudGallery/stargazers">
+<a href="https://github.com/spicouc/Photogram/stargazers">
   
-  <img src="https://img.shields.io/github/stars/AKS-Labs/CloudGallery?color=ffff00&style=for-the-badge&labelColor=a1a116&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRpdGxlPnN0YXI8L3RpdGxlPjxwYXRoIGQ9Ik0xMiwxNy4yN0wxOC4xOCwyMUwxNi41NCwxMy45N0wyMiw5LjI0TDE0LjgxLDguNjJMMTIsMkw5LjE5LDguNjJMMiw5LjI0TDcuNDUsMTMuOTdMNS44MiwyMUwxMiwxNy4yN1oiIGZpbGw9IndoaXRlIiAvPjwvc3ZnPg=="/>
+  <img src="https://img.shields.io/github/stars/spicouc/Photogram?color=ffff00&style=for-the-badge&labelColor=a1a116&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRpdGxlPnN0YXI8L3RpdGxlPjxwYXRoIGQ9Ik0xMiwxNy4yN0wxOC4xOCwyMUwxNi41NCwxMy45N0wyMiw5LjI0TDE0LjgxLDguNjJMMTIsMkw5LjE5LDguNjJMMiw5LjI0TDcuNDUsMTMuOTdMNS44MiwyMUwxMiwxNy4yN1oiIGZpbGw9IndoaXRlIiAvPjwvc3ZnPg=="/>
   
 </a>
 </div>
@@ -45,9 +45,9 @@
 
 ---
 
-## 🌟 What is CloudGallery?
+## 🌟 What is Photogram?
 
-**Chitralaya CloudGallery** is a simple open-source Android app  
+**Photogram** is a simple open-source Android app  
 that turns your Telegram account into a private photo cloud storage — no signup, no servers, no tracking.  
 
 Your photos go straight from your phone to your own Telegram chat,  
@@ -66,7 +66,7 @@ Before you scroll, let me make one thing clear —
 I’m just another user like you, tired of the usual *“cloud storage deal”* — free at first,  
 then you pay with your money... or even worse, with your privacy.  
 
-So I built something different — **Chitralaya CloudGallery**. 
+So I built something different — **Photogram**. 
 
 * It’s not a company, not a service.  
 * Just a simple, open-source tool —  
@@ -126,7 +126,7 @@ For me, Telegram felt like the lesser **evil.**
 
 But again — it’s your **choice.** I’m not telling you to trust Telegram.  
 I’m just saying: *here’s another option, do with it what you like.*  
-And if you want to dive deeper, check out the **[FAQ section](https://github.com/AKS-Labs/CloudGallery/blob/main/FAQ.md )** where I go through all these questions in detail.  
+And if you want to dive deeper, check out the **[FAQ section](https://github.com/spicouc/Photogram/blob/main/FAQ.md )** where I go through all these questions in detail.  
  
 **So my thought was simple:**  
 👉 If I’m anyway trusting a company, I’d rather trust Telegram (with unlimited space, no ads, no AI snooping)  
@@ -138,7 +138,7 @@ than Google(Google, which builds entire business models around data.).
 
 ## 🛡️ Transparency First
 
-I don’t want you to blindly trust me either. Here’s how CloudGallery works:
+I don’t want you to blindly trust me either. Here’s how Photogram works:
 
 * Your bot token & chat ID are **stored securely in Android keystore** (AES encryption).
 * Your photos go **directly to your Telegram account** — no middle servers.
@@ -149,7 +149,7 @@ Now, let me be fully transparent about limitations too:
 
 * Bot API has quirks → it can’t read your old messages without chat IDs.
 * That means if you reinstall the app fresh, you won’t automatically see your past uploads.
-* To fix that, CloudGallery keeps a **local JSON database** of synced images.
+* To fix that, Photogram keeps a **local JSON database** of synced images.
 * This JSON file is also backed up to your Telegram so you can re-import it on another phone.
 
 But warning ⚠️: This database is plain text (readable JSON), not encrypted. If you leak it, others can read metadata. Keep it safe. That’s your responsibility.
@@ -174,7 +174,7 @@ I’m being this honest because I believe trust starts with showing *both* the s
 
 ---
 
-In short: CloudGallery is a **privacy-first, direct backup tool** to Telegram.  
+In short: Photogram is a **privacy-first, direct backup tool** to Telegram.  
 
 It’s **not a full-featured cloud platform yet**, but it gives you **control over your photos** and the ability to **build on it with community support**.
 
@@ -193,7 +193,7 @@ It’s **not a full-featured cloud platform yet**, but it gives you **control ov
 
 ## 🔮 What can it do tomorrow?
 
-Here’s where you come in. CloudGallery is community-powered. With your support, I want to add:
+Here’s where you come in. Photogram is community-powered. With your support, I want to add:
 
 * 📤 Batch Upload & Delete
 * 🌙 Auto Sync at Bedtime
@@ -201,7 +201,7 @@ Here’s where you come in. CloudGallery is community-powered. With your support
 * ⏰ Schedule Time for Auto Periodic Backup (e.g. between 12 AM – 6 AM)
 * 📂 Folder-Specific Uploads
 * ☁️ Organized Folder Structure for Cloud Images
-* 🖼️ Share Images from Any App to Chitralaya CloudGallery to Upload Them Directly to Telegram via Chitralaya
+* 🖼️ Share Images from Any App to Photogram to Upload Them Directly to Telegram via Photogram
 * 🧠 100% Offline On-Device OCR Search (Find Photos by Text Inside Them)
 * 🤖 Multiple Bot Support
 * 🔐 **On-device encryption layer** → so even Telegram can’t peek into your files
@@ -218,7 +218,7 @@ These aren’t “marketing slides”. They’re real ideas sitting in my notes,
 I’m not a company. I’m not trying to “capture market share.”
 I’m just one developer building something I wanted for myself — and thought others might find useful.
 
-If you like CloudGallery and want to see it grow:
+If you like Photogram and want to see it grow:
 
 * ⭐ Star the repo
 * 💬 Join the [AKS-Labs Telegram group](https://t.me/AKSLabs)
@@ -232,7 +232,7 @@ Your photos, your choice.
 
 ---
 
-## 📥 **Get Chitralaya CloudGallery**
+## 📥 **Get Photogram**
 
 <div align="center">
     <p align="center">
@@ -241,7 +241,7 @@ Your photos, your choice.
          alt="Get it on F-Droid"
          height="80">
   </a>
-  <a href="https://github.com/AKS-Labs/CloudGallery/releases">
+  <a href="https://github.com/spicouc/Photogram/releases">
     <img alt="Get it on GitHub" src="https://user-images.githubusercontent.com/69304392/148696068-0cfea65d-b18f-4685-82b5-329a330b1c0d.png" height="80px">
   </a>
   <br>
@@ -282,7 +282,7 @@ Use it inside the app or in your API.
 ---
 
 ### 📱 **Step 2: Connect the App**
-1. Download **CloudGallery** from GitHub.  
+1. Download **Photogram** from GitHub.  
 2. Enter your **bot token** and **chat ID**.  
 3. Start backing up your photos! 🎉  
 
@@ -311,8 +311,8 @@ Join the community → [t.me/AKSLabs](https://t.me/AKSLabs)
 
 ## 🤝 **Community**
 
-- 🐛 **Bug reports:** [GitHub Issues](https://github.com/AKS-Labs/CloudGallery/issues)
-- 💡 **Feature requests:** [GitHub Issues](https://github.com/AKS-Labs/CloudGallery/issues)
+- 🐛 **Bug reports:** [GitHub Issues](https://github.com/spicouc/Photogram/issues)
+- 💡 **Feature requests:** [GitHub Issues](https://github.com/spicouc/Photogram/issues)
 - 👨‍💻 **Contribute:** Fork and submit pull requests
 - ⭐ **Show support:** Star the repository!
 
@@ -331,7 +331,7 @@ Join the community → [t.me/AKSLabs](https://t.me/AKSLabs)
   <h3>🔒 **Your Photos. Your Privacy. Your Control.** 🔒</h3>
   <p><strong>Experience unlimited photo backup without compromising your privacy!</strong></p>
 
-  <a href="https://github.com/AKS-Labs/CloudGallery/releases">
-    <strong>📥 Download CloudGallery Today!</strong>
+  <a href="https://github.com/spicouc/Photogram/releases">
+    <strong>📥 Download Photogram Today!</strong>
   </a>
 </div>

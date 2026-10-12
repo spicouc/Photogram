@@ -20,7 +20,7 @@ import androidx.documentfile.provider.DocumentFile
 object BackupHelper {
     const val JSON_MIME = "application/json"
     private const val TAG = "BackupHelper"
-    private const val DATABASE_BACKUP_PREFIX = "CloudGallery_Backup"
+    private const val DATABASE_BACKUP_PREFIX = "Photogram_Backup"
 
     private val mapper by lazy {
         ObjectMapper().apply {
@@ -50,7 +50,7 @@ object BackupHelper {
                 val directory = DocumentFile.fromTreeUri(context, uri)
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd_hh-mm-a", Locale.getDefault())
                 val timestamp = dateFormat.format(Date())
-                val fileName = "CloudGallery_Backup_${deviceId}_$timestamp.json"
+                val fileName = "Photogram_Backup_${deviceId}_$timestamp.json"
                 directory?.createFile(JSON_MIME, fileName)?.uri
             } else {
                 uri
