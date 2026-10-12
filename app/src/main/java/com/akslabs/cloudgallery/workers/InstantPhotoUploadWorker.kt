@@ -62,8 +62,8 @@ class InstantPhotoUploadWorker(
 
                         val activeEntry = uploadQueueDao.getActiveForPhoto(photo.localId)
                         if (activeEntry != null) {
-                            Log.d("PhotoUpload", "Skipping: active queue entry (${photo.localId})")
-                            return@withContext Result.success()
+                            Log.w("PhotoUpload", "Upload already queued for ${photo.localId}; not reporting success")
+                            return@withContext Result.retry()
                         }
 
                         val hash = photo.contentHash ?: ContentHasher.computeHash(appContext, photoUri)
