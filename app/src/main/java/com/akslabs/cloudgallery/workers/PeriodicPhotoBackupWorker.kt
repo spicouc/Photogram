@@ -142,7 +142,7 @@ class PeriodicPhotoBackupWorker(
                 }
 
                 Log.d("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed")
-                if (failedCount > imageList.size / 2) {
+                if (failedCount > 0) {
                     Result.retry()
                 } else {
                     Result.success(workDataOf())
@@ -177,8 +177,8 @@ class PeriodicPhotoBackupWorker(
             // 2. Check upload queue for active entry from another worker
             val activeQueueEntry = uploadQueueDao.getActiveForPhoto(photo.localId)
             if (activeQueueEntry != null) {
-                Log.d("PeriodicBackup", "Skipping ${photo.localId}: active queue entry exists")
-                return true
+                Log.w("PeriodicBackup", "Upload still queued for ${photo.localId}; not counting as completed")
+                return false
             }
 
             // 3. Compute content hash if missing
@@ -357,7 +357,7 @@ class PeriodicPhotoBackupWorker(
         const val KEY_TOTAL_DONE = "total_done"
         const val KEY_TOTAL_PHOTOS = "total_photos"
         const val MAX_BATCH_SIZE = 50
-        const val PARALLELISM = 3
+        const val PARALLELISM = 1
         const val DELAY_BETWEEN_CHUNKS_MS = 1500L
         const val MAX_RETRIES = 3
     }
