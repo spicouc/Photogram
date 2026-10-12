@@ -32,6 +32,11 @@ interface UploadQueueDao {
     @Query("UPDATE upload_queue SET status = 'CANCELLED' WHERE id = :id")
     suspend fun markCancelled(id: Long)
 
+    // An interrupted worker can leave a row IN_PROGRESS forever.
+    // Only reclaim entries older than the timeout to avoid stealing live uploads.
+    @Query("UPDATE upload_queue SET status = 'FAILED', errorMessage = 'Interrupted upload; eligible for retry', retryCount = retryCount + 1 WHERE status = 'IN_PROGRESS' AND startedAt < :cutoff")
+    suspend fun failStaleInProgress(cutoff: Long): Int
+
     @Query("SELECT * FROM upload_queue WHERE id = :id")
     suspend fun getById(id: Long): UploadQueue?
 
