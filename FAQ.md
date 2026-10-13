@@ -1,12 +1,12 @@
-# Chitralaya CloudGallery – FAQ
+# Photogram – FAQ
 
 > **Disclaimer / Transparency Note:**  
 > I, Aditya from AKS-Labs, have shared this information **to the best of my knowledge**.  
-> I have tried to be as transparent as possible about how Chitralaya CloudGallery works.  
+> I have tried to be as transparent as possible about how Photogram works.  
 > Still, you should **not solely rely on this information** — research and understand how Telegram handles your data by reading their **updated policies**.  
-> If you have questions, you can join the **[AKS-Labs Telegram group](https://t.me/AKSLabs)** and ask freely without hesitation.  
+> If you have questions, you can join the **[original project's Telegram group](https://t.me/AKSLabs)** and ask freely without hesitation.  
 
-Chitralaya CloudGallery backs up your photos **directly to your own Telegram account** using your bot token and chat ID No Sign-Up Required.  
+Photogram backs up your photos **directly to your own Telegram account** using your bot token and chat ID No Sign-Up Required.  
 No third-party servers, no hidden processing — just your device and Telegram.
 
 ---
@@ -20,24 +20,24 @@ No third-party servers, no hidden processing — just your device and Telegram.
 5. [What happens if I uninstall the app?](#q5-what-happens-if-i-uninstall-the-app)  
 6. [What if I lose my phone?](#q6-what-if-i-lose-my-phone)  
 7. [What if my bot token is leaked?](#q7-what-if-my-bot-token-is-leaked)  
-8. [Does Chitralaya CloudGallery compress or modify photos?](#q8-does-chitralaya-cloudgallery-compress-or-modify-photos)  
+8. [Does Photogram compress or modify photos?](#q8-does-chitralaya-cloudgallery-compress-or-modify-photos)  
 9. [How is this different from normal Telegram uploads?](#q9-how-is-this-different-from-normal-telegram-uploads)  
 10. [What if Telegram bans or suspends my account?](#q10-what-if-telegram-bans-or-suspends-my-account)  
 11. [Can I download my photos back from Telegram?](#q11-can-i-download-my-photos-back-from-telegram)  
-12. [Is Chitralaya CloudGallery open source?](#q12-is-chitralaya-cloudgallery-open-source)  
+12. [Is Photogram open source?](#q12-is-chitralaya-cloudgallery-open-source)  
 13. [Does this count against Telegram’s storage limit?](#q13-does-this-count-against-telegrams-storage-limit)  
 14. [Can Telegram staff see my photos?](#q14-can-telegram-staff-see-my-photos)  
 15. [Can I share my bot with family to store their photos?](#q15-can-i-share-my-bot-with-family-to-store-their-photos)  
-16. [Does Chitralaya CloudGallery work offline?](#q16-does-chitralaya-cloudgallery-work-offline)  
+16. [Does Photogram work offline?](#q16-does-chitralaya-cloudgallery-work-offline)  
 17. [What if Telegram removes bots in the future?](#q17-what-if-telegram-removes-bots-in-the-future)  
-18. [Why use Chitralaya CloudGallery?](#q18-why-use-chitralaya-cloudgallery)  
+18. [Why use Photogram?](#q18-why-use-chitralaya-cloudgallery)  
 19. [How does it compare with Google Photos?](#q19-how-does-it-compare-with-google-photos)  
-20. [Why choose Chitralaya CloudGallery over Google Photos?](#q20-why-choose-chitralaya-cloudgallery-over-google-photos)  
+20. [Why choose Photogram over Google Photos?](#q20-why-choose-chitralaya-cloudgallery-over-google-photos)  
 21. [Support & Future Features](#support--future-features)
 
 ---
 
-## 🔹 Part 1: General Questions About Chitralaya CloudGallery
+## 🔹 Part 1: General Questions About Photogram
 
 ### Q1: Does Telegram disclose user data?  
 ➡️ According to **Telegram’s Privacy Policy**:  
@@ -64,7 +64,7 @@ No third-party servers, no hidden processing — just your device and Telegram.
 
 ### Q4: Can the developer access my photos?  
 ➡️ **No.**  
-- Chitralaya CloudGallery never uploads to any server.  
+- Photogram never uploads to any server.  
 - Only **you and Telegram** can access your uploaded files.
 
 ---
@@ -101,7 +101,7 @@ No third-party servers, no hidden processing — just your device and Telegram.
 
 ---
 
-### Q8: Does Chitralaya CloudGallery compress or modify photos?  
+### Q8: Does Photogram compress or modify photos?  
 ➡️ **No.**  
 - All photos are uploaded **exactly as they are**, no compression, no resizing, no AI processing.
 
@@ -109,7 +109,7 @@ No third-party servers, no hidden processing — just your device and Telegram.
 
 ### Q9: How is this different from normal Telegram uploads?  
 ➡️ Normal uploads are **manual**.  
-- Chitralaya CloudGallery automates full-device photo backup directly to your bot chat.  
+- Photogram automates full-device photo backup directly to your bot chat.  
 - **Enhanced Gallery Experience:**  
   - Browse photos in a beautiful gallery interface.  
   - Download images directly from the app.  
@@ -129,11 +129,11 @@ No third-party servers, no hidden processing — just your device and Telegram.
 ### Q11: Can I download my photos back from Telegram?  
 ➡️ Yes, you can:  
 - Directly via Telegram app or Telegram Desktop.  
-- **Or using Chitralaya CloudGallery**, which allows downloading within the app.
+- **Or using Photogram**, which allows downloading within the app.
 
 ---
 
-### Q12: Is Chitralaya CloudGallery open source?  
+### Q12: Is Photogram open source?  
 ➡️ **Yes.**  
 - Full code is on GitHub.  
 - Anyone can audit it for security or privacy.
@@ -159,18 +159,18 @@ No third-party servers, no hidden processing — just your device and Telegram.
 
 ---
 
-### Q16: Does Chitralaya CloudGallery work offline?  
+### Q16: Does Photogram work offline?  
 ➡️ No.  
 - Internet is required to upload photos via Telegram Bot API.
 
 ---
 
 ### Q17: What if Telegram removes bots in the future?  
-➡️ Chitralaya CloudGallery may stop uploading new photos, but **already uploaded media will likely remain accessible** in your Telegram account.
+➡️ Photogram may stop uploading new photos, but **already uploaded media will likely remain accessible** in your Telegram account.
 
 ---
 
-### Q18: Why use Chitralaya CloudGallery?  
+### Q18: Why use Photogram?  
 ➡️ It offers:  
 - Full control (your bot, your account, your rules)  
 - Unlimited storage  
@@ -179,7 +179,7 @@ No third-party servers, no hidden processing — just your device and Telegram.
 
 ---
 
-## 🔹 Part 2: Comparing Chitralaya CloudGallery with Google Photos
+## 🔹 Part 2: Comparing Photogram with Google Photos
 
 ### Q19: How does it compare with Google Photos?  
 
@@ -195,7 +195,7 @@ No third-party servers, no hidden processing — just your device and Telegram.
 
 ---
 
-### Q20: Why choose Chitralaya CloudGallery over Google Photos?  
+### Q20: Why choose Photogram over Google Photos?  
 ➡️ Because it gives:  
 - **Full user control** (your bot, your token, your chat)  
 - **Unlimited storage**  
@@ -215,9 +215,9 @@ If you like my work, please consider **donating** to this project so it can stay
 4. More beautiful M3 expressive UI/UX  
 5. Configure multiple bots  
 6. Folder-specific uploads  
-7. Your suggestions! Share on **[AKS-Labs Telegram group](https://t.me/AKSLabs)**
+7. Your suggestions! Share on **[original project's Telegram group](https://t.me/AKSLabs)**
 
 ---
 
 ✅ **Bottom Line:**  
-Chitralaya CloudGallery is **open-source, transparent, and provides unlimited user-controlled storage** — a strong, practical alternative to Google Photos or iCloud.
+Photogram is **open-source, transparent, and provides unlimited user-controlled storage** — a strong, practical alternative to Google Photos or iCloud.
