@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -42,6 +43,8 @@ import com.akslabs.cloudgallery.data.localdb.backup.BackupHelper
 import com.akslabs.cloudgallery.services.CloudPhotoSyncService
 import com.akslabs.cloudgallery.utils.Constants
 import com.akslabs.cloudgallery.utils.MetadataConfig
+import com.akslabs.cloudgallery.ui.main.nav.Screens
+import com.akslabs.cloudgallery.utils.DebugLogManager
 import com.akslabs.cloudgallery.utils.toastFromMainThread
 import com.akslabs.cloudgallery.workers.WorkModule
 import com.akslabs.cloudgallery.data.mediastore.AlbumInfo
@@ -300,7 +303,10 @@ fun SettingsItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier.clip(RoundedCornerShape(32.dp)).background(MaterialTheme.colorScheme.background)) {
+fun SettingsScreen(
+    modifier: Modifier = Modifier.clip(RoundedCornerShape(32.dp)).background(MaterialTheme.colorScheme.background),
+    navController: androidx.navigation.NavController? = null
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -1041,6 +1047,24 @@ fun SettingsScreen(modifier: Modifier = Modifier.clip(RoundedCornerShape(32.dp))
                         }
                     )
                 }
+            }
+
+            // DEBUG SECTION
+            Spacer(modifier = Modifier.height(16.dp))
+            SettingsSection(title = "Debug")
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow
+            ) {
+                SettingsItem(
+                    icon = Icons.Rounded.BugReport,
+                    title = "Debug Logs",
+                    subtitle = "View app logs for troubleshooting",
+                    onClick = {
+                        navController?.navigate(Screens.DebugLogs.route)
+                    }
+                )
             }
 
             // ABOUT SECTION

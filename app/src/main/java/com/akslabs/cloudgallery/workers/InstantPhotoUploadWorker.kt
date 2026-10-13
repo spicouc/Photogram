@@ -45,12 +45,14 @@ class InstantPhotoUploadWorker(
         val recoveredStale = uploadQueueDaoEarly.failStaleInProgress(staleCutoff)
         if (recoveredStale > 0) {
             Log.w("PhotoUpload", "Recovered $recoveredStale stale interrupted uploads")
+            com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Recovered $recoveredStale stale interrupted uploads")
         }
 
         // Reset failed uploads that still have retries remaining
         val resetFailed = uploadQueueDaoEarly.resetFailedToPending(MAX_RETRIES)
         if (resetFailed > 0) {
             Log.i("PhotoUpload", "Reset $resetFailed failed uploads for retry")
+            com.akslabs.cloudgallery.utils.DebugLogManager.i("PhotoUpload", "Reset $resetFailed failed uploads for retry")
         }
 
         val uploadBlock: suspend () -> Result = {
@@ -77,6 +79,7 @@ class InstantPhotoUploadWorker(
                         val activeEntry = uploadQueueDao.getActiveForPhoto(photo.localId)
                         if (activeEntry != null) {
                             Log.w("PhotoUpload", "Upload already queued for ${photo.localId}; not reporting success")
+                            com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Upload already queued for ${photo.localId}; retrying")
                             return@withContext Result.retry()
                         }
 
@@ -200,6 +203,7 @@ class InstantPhotoUploadWorker(
                     ))
                 } catch (e: Throwable) {
                     Log.d("PhotoUpload", "FAILED, will retry: ${e.localizedMessage}")
+                    com.akslabs.cloudgallery.utils.DebugLogManager.e("PhotoUpload", "Upload failed, will retry: ${e.localizedMessage}")
                     Result.retry()
                 }
             }

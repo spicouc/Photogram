@@ -103,6 +103,7 @@ class PeriodicPhotoBackupWorker(
         return withContext(Dispatchers.IO) {
             try {
                 Log.d("PeriodicBackup", "Found ${allPending.size} photos pending, processing batch of ${imageList.size} (deviceId=$deviceId)")
+                com.akslabs.cloudgallery.utils.DebugLogManager.d("PeriodicBackup", "Found ${allPending.size} photos pending, processing batch of ${imageList.size}")
 
                 setProgress(
                     workDataOf(
@@ -155,14 +156,18 @@ class PeriodicPhotoBackupWorker(
                 }
 
                 Log.d("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed")
+                com.akslabs.cloudgallery.utils.DebugLogManager.i("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed")
                 // Only retry if there were actual failures (not just skipped/deduped)
                 if (failedCount > 0) {
+                    com.akslabs.cloudgallery.utils.DebugLogManager.w("PeriodicBackup", "Batch had failures - will retry")
                     Result.retry()
                 } else {
+                    com.akslabs.cloudgallery.utils.DebugLogManager.i("PeriodicBackup", "Batch complete - all succeeded")
                     Result.success(workDataOf())
                 }
             } catch (e: Exception) {
                 Log.e("PeriodicBackup", "Backup failed, will retry: ${e.message}")
+                com.akslabs.cloudgallery.utils.DebugLogManager.e("PeriodicBackup", "Backup failed, will retry: ${e.message}")
                 Result.retry()
             }
         }

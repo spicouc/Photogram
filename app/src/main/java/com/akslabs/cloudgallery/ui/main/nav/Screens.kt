@@ -27,6 +27,8 @@ sealed class Screens(val displayTitle: String, val route: String, val icon: Imag
 
     data object ManageUploads : Screens(displayTitle = "Manage Uploads", route = "manage_uploads", icon = Icons.Default.CloudUpload)
 
+    data object DebugLogs : Screens(displayTitle = "Debug Logs", route = "debug_logs")
+
     companion object {
         val drawerScreens by lazy { listOf(LocalPhotos, RemotePhotos, Settings) }
     }
