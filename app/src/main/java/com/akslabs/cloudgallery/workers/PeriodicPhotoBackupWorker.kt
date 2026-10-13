@@ -52,6 +52,19 @@ class PeriodicPhotoBackupWorker(
         val remotePhotoDao = DbHolder.database.remotePhotoDao()
         val uploadQueueDao = DbHolder.database.uploadQueueDao()
 
+        // Recover stale IN_PROGRESS uploads from previous interrupted workers
+        val staleCutoff = System.currentTimeMillis() - STALE_UPLOAD_TIMEOUT_MS
+        val recoveredStale = uploadQueueDao.failStaleInProgress(staleCutoff)
+        if (recoveredStale > 0) {
+            Log.w("PeriodicBackup", "Recovered $recoveredStale stale interrupted uploads")
+        }
+
+        // Reset failed uploads that still have retries remaining
+        val resetFailed = uploadQueueDao.resetFailedToPending(MAX_RETRIES)
+        if (resetFailed > 0) {
+            Log.i("PeriodicBackup", "Reset $resetFailed failed uploads for retry")
+        }
+
         val allPending = photoDao.getAllPendingUpload()
         val excludedBucketNames = Preferences.getExcludedBucketNames()
         val syncMode = Preferences.getSyncMode()
@@ -142,6 +155,7 @@ class PeriodicPhotoBackupWorker(
                 }
 
                 Log.d("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed")
+                // Only retry if there were actual failures (not just skipped/deduped)
                 if (failedCount > 0) {
                     Result.retry()
                 } else {
@@ -360,5 +374,6 @@ class PeriodicPhotoBackupWorker(
         const val PARALLELISM = 1
         const val DELAY_BETWEEN_CHUNKS_MS = 1500L
         const val MAX_RETRIES = 3
+        const val STALE_UPLOAD_TIMEOUT_MS = 10 * 60 * 1000L // 10 minutes
     }
 }

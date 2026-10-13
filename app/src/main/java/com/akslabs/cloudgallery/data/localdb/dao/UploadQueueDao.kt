@@ -40,6 +40,9 @@ interface UploadQueueDao {
     @Query("SELECT * FROM upload_queue WHERE id = :id")
     suspend fun getById(id: Long): UploadQueue?
 
+    @Query("UPDATE upload_queue SET status = 'PENDING', errorMessage = null, retryCount = 0 WHERE status = 'FAILED' AND retryCount < :maxRetries")
+    suspend fun resetFailedToPending(maxRetries: Int): Int
+
     @Query("DELETE FROM upload_queue WHERE status = 'DONE' AND completedAt < :before")
     suspend fun cleanupOld(before: Long)
 

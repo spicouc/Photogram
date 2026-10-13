@@ -39,6 +39,20 @@ class InstantPhotoUploadWorker(
             return Result.failure()
         }
 
+        // Recover stale IN_PROGRESS uploads from previous interrupted workers
+        val uploadQueueDaoEarly = DbHolder.database.uploadQueueDao()
+        val staleCutoff = System.currentTimeMillis() - STALE_UPLOAD_TIMEOUT_MS
+        val recoveredStale = uploadQueueDaoEarly.failStaleInProgress(staleCutoff)
+        if (recoveredStale > 0) {
+            Log.w("PhotoUpload", "Recovered $recoveredStale stale interrupted uploads")
+        }
+
+        // Reset failed uploads that still have retries remaining
+        val resetFailed = uploadQueueDaoEarly.resetFailedToPending(MAX_RETRIES)
+        if (resetFailed > 0) {
+            Log.i("PhotoUpload", "Reset $resetFailed failed uploads for retry")
+        }
+
         val uploadBlock: suspend () -> Result = {
             withContext(Dispatchers.IO) {
                 try {
@@ -212,5 +226,6 @@ class InstantPhotoUploadWorker(
         const val KEY_FILE_NAME = "fileName"
         const val KEY_UPLOAD_TYPE = "upload_type"
         const val MAX_RETRIES = 3
+        const val STALE_UPLOAD_TIMEOUT_MS = 10 * 60 * 1000L // 10 minutes
     }
 }

@@ -189,13 +189,29 @@ object BotApi {
                 val bodyString = okResponse.body?.string()
 
                 if (!okResponse.isSuccessful) {
-                    Log.e(TAG, "❌ sendDocumentMultipart: HTTP ${okResponse.code}: $bodyString")
+                    val errorCode = okResponse.code
+                    Log.e(TAG, "❌ sendDocumentMultipart: HTTP $errorCode: $bodyString")
+
+                    // Parse 429 retry_after for proper backoff
+                    if (errorCode == 429) {
+                        try {
+                            val json = com.google.gson.JsonParser.parseString(bodyString ?: "{}").asJsonObject
+                            val retryAfter = json.getAsJsonObject("parameters")?.get("retry_after")?.asInt
+                            if (retryAfter != null && retryAfter > 0) {
+                                Log.w(TAG, "⏳ Telegram rate limit: waiting ${retryAfter}s before retry")
+                                kotlinx.coroutines.delay(retryAfter * 1000L)
+                            }
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Failed to parse 429 retry_after", e)
+                        }
+                    }
+
                     val errorBody = okResponse.body?.let {
                         okhttp3.ResponseBody.create("application/json".toMediaType(), bodyString ?: "")
                     }
                     val retrofitResponse = retrofit2.Response.error<Response<Message>?>(
                         okResponse.code,
-                        errorBody ?: okhttp3.ResponseBody.create("application/json".toMediaType(), """{"ok":false,"description":"HTTP ${okResponse.code}"}""")
+                        errorBody ?: okhttp3.ResponseBody.create("application/json".toMediaType(), """{"ok":false,"description":"HTTP $errorCode"}""")
                     )
                     return@withContext Pair(retrofitResponse, null)
                 }

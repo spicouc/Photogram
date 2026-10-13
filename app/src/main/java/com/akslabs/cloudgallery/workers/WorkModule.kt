@@ -172,7 +172,7 @@ object WorkModule {
             val workId = instantUploadRequest.id.toString()
             manager.enqueueUniqueWork(
                 "$UPLOADING_ID:${uri.lastPathSegment}",
-                ExistingWorkPolicy.KEEP,
+                ExistingWorkPolicy.APPEND_OR_REPLACE,
                 instantUploadRequest
             )
             WorkPhotoRegistry.register(workId, uri.toString())
