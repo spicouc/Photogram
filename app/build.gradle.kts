@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.akslabs.cloudgallery"
-    compileSdk = 34  // Temporarily using 34 for build verification
+    compileSdk = 36
     
     defaultConfig {
         applicationId = "com.akslabs.cloudgallery"
         minSdk = 29  // Keep Android 10 as minimum
-        targetSdk = 34  // Temporarily using 34 for build verification
+        targetSdk = 36
         versionCode = 8
         versionName = "0.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

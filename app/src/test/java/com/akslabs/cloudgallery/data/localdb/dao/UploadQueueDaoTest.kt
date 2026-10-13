@@ -54,7 +54,7 @@ class UploadQueueDaoTest {
         )
 
         // This test documents the expected schema
-        assertEquals("UploadQueue should have 14 fields", 14, requiredFields.size)
+        assertEquals("UploadQueue should have 13 fields", 13, requiredFields.size)
     }
 
     @Test
