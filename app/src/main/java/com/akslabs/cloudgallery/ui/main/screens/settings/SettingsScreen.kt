@@ -861,6 +861,50 @@ fun SettingsScreen(
                 }
             }
 
+            // MEDIA TYPE SECTION
+            Spacer(modifier = Modifier.height(16.dp))
+            SettingsSection(title = "Media Types")
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow
+            ) {
+                var isUploadPhotosEnabled by remember {
+                    mutableStateOf(Preferences.isUploadPhotosEnabled())
+                }
+                var isUploadVideoEnabled by remember {
+                    mutableStateOf(Preferences.isUploadVideoEnabled())
+                }
+
+                SettingsSwitchItem(
+                    icon = Icons.Rounded.PhotoLibrary,
+                    title = "Upload Photos",
+                    subtitle = "Include photos in auto-sync backup",
+                    isChecked = isUploadPhotosEnabled,
+                    onCheckedChange = { enabled ->
+                        isUploadPhotosEnabled = enabled
+                        Preferences.setUploadPhotosEnabled(enabled)
+                        scope.launch {
+                            context.toastFromMainThread(if (enabled) "Photo uploads enabled" else "Photo uploads disabled")
+                        }
+                    }
+                )
+
+                SettingsSwitchItem(
+                    icon = Icons.Rounded.VideoLibrary,
+                    title = "Upload Video",
+                    subtitle = "Include videos in auto-sync backup",
+                    isChecked = isUploadVideoEnabled,
+                    onCheckedChange = { enabled ->
+                        isUploadVideoEnabled = enabled
+                        Preferences.setUploadVideoEnabled(enabled)
+                        scope.launch {
+                            context.toastFromMainThread(if (enabled) "Video uploads enabled" else "Video uploads disabled")
+                        }
+                    }
+                )
+            }
+
             // EXCLUDE FOLDERS SECTION
             Spacer(modifier = Modifier.height(16.dp))
             SettingsSection(title = "Exclude Folders")
@@ -1090,12 +1134,19 @@ fun SettingsScreen(
                         onClick = { openLinkFromHref(Constants.joinTelegra) }
                     )
 
+                    var versionTapCount by remember { mutableIntStateOf(0) }
                     SettingsItem(
                         icon = Icons.Rounded.Info,
                         title = "Version",
                         subtitle = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
                         onClick = {
-                            scope.launch { context.toastFromMainThread("Version ${BuildConfig.VERSION_NAME}") }
+                            versionTapCount++
+                            if (versionTapCount >= 10) {
+                                versionTapCount = 0
+                                navController?.navigate(Screens.DebugLogs.route)
+                            } else {
+                                scope.launch { context.toastFromMainThread("Version ${BuildConfig.VERSION_NAME}") }
+                            }
                         }
                     )
 
@@ -1272,70 +1323,95 @@ private fun ManageExcludedFoldersDialog(
             }
         },
         text = {
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(150.dp),
-                        contentAlignment = Alignment.Center
+            Column {
+                // Select All button
+                if (albums.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        CircularProgressIndicator()
+                        val allExcluded = excludedNames.containsAll(albums.map { it.label })
+                        TextButton(
+                            onClick = {
+                                excludedNames = if (allExcluded) {
+                                    emptySet()
+                                } else {
+                                    albums.map { it.label }.toSet()
+                                }
+                            }
+                        ) {
+                            Text(if (allExcluded) "Deselect All" else "Select All")
+                        }
                     }
                 }
-                loadError -> {
-                    Text("Could not load albums. Make sure storage permission is granted.")
-                }
-                albums.isEmpty() -> {
-                    Text("No albums found on this device.")
-                }
-                else -> {
-                    val sortedAlbums = remember(albums, excludedNames) {
-                        albums.sortedByDescending { it.label in excludedNames }
+
+                when {
+                    isLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(150.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                    Column(
-                        modifier = Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState())
-                    ) {
-                        sortedAlbums.forEach { album ->
-                            val isExcluded = album.label in excludedNames
-                            Surface(
-                                onClick = {
-                                    excludedNames = if (isExcluded) excludedNames - album.label
-                                                    else excludedNames + album.label
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isExcluded) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
-                                        else MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                    loadError -> {
+                        Text("Could not load albums. Make sure storage permission is granted.")
+                    }
+                    albums.isEmpty() -> {
+                        Text("No albums found on this device.")
+                    }
+                    else -> {
+                        val sortedAlbums = remember(albums, excludedNames) {
+                            albums.sortedByDescending { it.label in excludedNames }
+                        }
+                        Column(
+                            modifier = Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState())
+                        ) {
+                            sortedAlbums.forEach { album ->
+                                val isExcluded = album.label in excludedNames
+                                Surface(
+                                    onClick = {
+                                        excludedNames = if (isExcluded) excludedNames - album.label
+                                                        else excludedNames + album.label
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isExcluded) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
+                                            else MaterialTheme.colorScheme.surface,
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
                                 ) {
-                                    Checkbox(
-                                        checked = isExcluded,
-                                        onCheckedChange = { checked ->
-                                            excludedNames = if (checked) excludedNames + album.label
-                                                            else excludedNames - album.label
-                                        },
-                                        colors = CheckboxDefaults.colors(
-                                            checkedColor = MaterialTheme.colorScheme.error,
-                                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(
+                                            checked = isExcluded,
+                                            onCheckedChange = { checked ->
+                                                excludedNames = if (checked) excludedNames + album.label
+                                                                else excludedNames - album.label
+                                            },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = MaterialTheme.colorScheme.error,
+                                                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
                                         )
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Icon(
-                                        imageVector = Icons.Rounded.Folder,
-                                        contentDescription = null,
-                                        tint = if (isExcluded) MaterialTheme.colorScheme.error
-                                               else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = album.label,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = if (isExcluded) MaterialTheme.colorScheme.error
-                                                else MaterialTheme.colorScheme.onSurface
-                                    )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Icon(
+                                            imageVector = Icons.Rounded.Folder,
+                                            contentDescription = null,
+                                            tint = if (isExcluded) MaterialTheme.colorScheme.error
+                                                   else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = album.label,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = if (isExcluded) MaterialTheme.colorScheme.error
+                                                    else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
                                 }
                             }
                         }

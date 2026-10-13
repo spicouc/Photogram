@@ -64,6 +64,8 @@ object Preferences {
     const val syncNewOnlyTimestampKey: String = "syncNewOnlyTimestamp"
     const val SYNC_MODE_ALL: String = "all"
     const val SYNC_MODE_NEW_ONLY: String = "newOnly"
+    const val uploadPhotosKey: String = "uploadPhotos"
+    const val uploadVideoKey: String = "uploadVideo"
 
     private const val prefFile: String = "preferences"
     private const val encryptedPrefFile: String = "encryptedPreferences"
@@ -155,6 +157,18 @@ object Preferences {
 
     fun setSyncNewOnlyTimestamp(timestamp: Long) {
         edit { putLong(syncNewOnlyTimestampKey, timestamp) }
+    }
+
+    fun isUploadPhotosEnabled(): Boolean = getBoolean(uploadPhotosKey, true)
+
+    fun setUploadPhotosEnabled(enabled: Boolean) {
+        edit { putBoolean(uploadPhotosKey, enabled) }
+    }
+
+    fun isUploadVideoEnabled(): Boolean = getBoolean(uploadVideoKey, true)
+
+    fun setUploadVideoEnabled(enabled: Boolean) {
+        edit { putBoolean(uploadVideoKey, enabled) }
     }
 
     fun getStringFlow(key: String, defValue: String): StateFlow<String> {
