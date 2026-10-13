@@ -111,7 +111,7 @@ fun DisclaimerScreen(
 //            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Chitralaya",
+                text = "Photogram",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontWeight = FontWeight.Black,
                     letterSpacing = (-1).sp
