@@ -1027,7 +1027,7 @@ fun SettingsScreen(
                         onClick = {
                             val dateFormat = SimpleDateFormat("yyyy-MM-dd_hh-mm-a", Locale.getDefault())
                             val timestamp = dateFormat.format(Date())
-                            val defaultFileName = "CloudGallery_Backup_$timestamp.json"
+                            val defaultFileName = "Photogram_Backup_$timestamp.json"
                             exportBackupFileLauncher.launch(defaultFileName)
                         }
                     )
@@ -1079,7 +1079,7 @@ fun SettingsScreen(
                     SettingsItem(
                         icon = Icons.Rounded.Android,
                         title = "More Apps",
-                        subtitle = "More Apps by AKS-Labs",
+                        subtitle = "Photogram on GitHub",
                         onClick = { showMoreAppsSheet = true }
                     )
 
