@@ -32,6 +32,13 @@ class App : Application() {
         ConnectivityObserver.init(applicationContext)
         BotApi.create()
 
+        // Resume a pending upload backlog on cold start when auto-backup is on.
+        // Without this the drain only restarts when the user taps upload or the
+        // (daily/weekly) periodic trigger fires.
+        if (Preferences.getBoolean(Preferences.isAutoBackupEnabledKey, false)) {
+            WorkModule.PeriodicBackup.enqueue()
+        }
+
         val imageLoader = ImageLoader.Builder(this)
             .crossfade(false)                     // disable global crossfade
             .allowHardware(false)                 // prefer software decoding for consistent scroll

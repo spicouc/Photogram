@@ -59,7 +59,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 combine(
                     WorkModule.observeWorkerByTag("manual_backup"),
                     WorkModule.observeWorkerByTag("instant_upload"),
-                    WorkModule.observeWorkerByName("InstantPhotoBackupWork"),
+                    WorkModule.observeWorkerByName(WorkModule.INSTANT_BACKUP_WORK),
                     WorkModule.observeWorkerByName(WorkModule.PERIODIC_PHOTO_BACKUP_WORK)
                 ) { manualWorkList, instantWorkList, instantPeriodicList, periodicWorkList ->
                     val manualActive = manualWorkList.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }

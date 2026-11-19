@@ -531,9 +531,15 @@ class ManageUploadsViewModel(application: Application) : AndroidViewModel(applic
         val failedIds = failed.map { it.id }.toSet()
         // Mark as retrying immediately so UI shows "Retrying..." without dismissing
         _retryingIds.value = _retryingIds.value + failedIds
-        // Enqueue periodic backup if any manual/auto backup failed
-        if (failed.any { it.type == UploadType.Selective || it.type == UploadType.Background }) {
-            WorkModule.PeriodicBackup.enqueue()
+        viewModelScope.launch {
+            // Re-arm uploads whose automatic retries were exhausted, otherwise an
+            // explicit "retry all" would find nothing left to do.
+            DbHolder.database.uploadQueueDao().resetAllCancelledToPending()
+            DbHolder.database.photoDao().resetSkippedToFailed()
+            // Enqueue periodic backup if any manual/auto backup failed
+            if (failed.any { it.type == UploadType.Selective || it.type == UploadType.Background }) {
+                WorkModule.PeriodicBackup.enqueue()
+            }
         }
     }
 

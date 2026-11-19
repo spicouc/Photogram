@@ -95,8 +95,45 @@ interface PhotoDao {
     @Query("SELECT * FROM photos WHERE contentHash IS NULL")
     suspend fun getAllNeedingHash(): List<Photo>
 
-    @Query("SELECT * FROM photos WHERE uploadStatus IN ('NONE', 'FAILED') AND remoteId IS NULL")
-    suspend fun getAllPendingUpload(): List<Photo>
+    /**
+     * Pending photos eligible for an upload attempt.
+     *
+     * [retryCutoff] implements a cool-down for photos that failed recently, so a
+     * handful of permanently failing files can never monopolise every batch while
+     * the rest of the backlog waits. Photos that were never attempted ('NONE')
+     * are always eligible.
+     */
+    @Query(
+        """
+        SELECT * FROM photos
+        WHERE remoteId IS NULL
+          AND uploadStatus IN ('NONE', 'FAILED')
+          AND (uploadStatus = 'NONE' OR lastUploadAttempt IS NULL OR lastUploadAttempt <= :retryCutoff)
+        ORDER BY COALESCE(lastUploadAttempt, 0) ASC
+        """
+    )
+    suspend fun getAllPendingUpload(retryCutoff: Long): List<Photo>
+
+    /**
+     * A process can be killed after a photo was marked 'UPLOADING' but before the
+     * result was persisted. Such photos are invisible to [getAllPendingUpload], so
+     * put them back to 'FAILED' unless a live queue entry is still working on them.
+     */
+    @Query(
+        """
+        UPDATE photos SET uploadStatus = 'FAILED', lastUploadAttempt = :now
+        WHERE uploadStatus = 'UPLOADING'
+          AND localId NOT IN (
+              SELECT localId FROM upload_queue
+              WHERE status = 'IN_PROGRESS' AND startedAt >= :liveCutoff
+          )
+        """
+    )
+    suspend fun failStaleUploadingPhotos(liveCutoff: Long, now: Long): Int
+
+    /** Re-arms photos that exhausted their automatic retries (explicit user action). */
+    @Query("UPDATE photos SET uploadStatus = 'FAILED', lastUploadAttempt = NULL WHERE uploadStatus = 'SKIPPED' AND remoteId IS NULL")
+    suspend fun resetSkippedToFailed(): Int
 
     @Query("SELECT * FROM photos WHERE uploadStatus IN ('NONE', 'FAILED', 'UPLOADING') AND remoteId IS NULL ORDER BY lastUploadAttempt DESC")
     fun getPendingUploadFlow(): Flow<List<Photo>>

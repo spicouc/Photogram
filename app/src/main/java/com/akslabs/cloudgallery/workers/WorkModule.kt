@@ -8,6 +8,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -54,36 +55,53 @@ object WorkModule {
             ).toLong()
         }
 
+        private fun buildImmediateBackupRequest(
+            type: String?,
+            forceRetry: Boolean
+        ): OneTimeWorkRequest {
+            return OneTimeWorkRequestBuilder<PeriodicPhotoBackupWorker>()
+                .setInputData(
+                    workDataOf(
+                        PeriodicPhotoBackupWorker.KEY_COMPRESSION_THRESHOLD to 1024 * 50L,
+                        PeriodicPhotoBackupWorker.KEY_UPLOAD_TYPE to type,
+                        PeriodicPhotoBackupWorker.KEY_FORCE_RETRY to forceRetry
+                    )
+                )
+                .setConstraints(getConstraints())
+                .setBackoffCriteria(
+                    backoffPolicy = BackoffPolicy.LINEAR,
+                    duration = Duration.ofMinutes(10)
+                )
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
+        }
+
         fun enqueue(forceUpdate: Boolean = false, onlySchedule: Boolean = false, type: String? = null) {
             val constraints = getConstraints()
             val repeatIntervalDays = getRepeatIntervalDays()
 
-            // 1️⃣ Immediate one-time backup
+            // 1️⃣ Immediate one-time backup. KEEP (instead of REPLACE) so tapping
+            // "upload" or changing a setting never cancels a batch that is already
+            // running; a chain in progress keeps draining the backlog.
+            // An explicit enqueue also bypasses the failed-photo cool-down.
             if (!onlySchedule) {
-                val instantBackupRequest =
-                    OneTimeWorkRequestBuilder<PeriodicPhotoBackupWorker>()
-                        .setInputData(
-                            workDataOf(
-                                PeriodicPhotoBackupWorker.KEY_COMPRESSION_THRESHOLD to 1024 * 50L,
-                                PeriodicPhotoBackupWorker.KEY_UPLOAD_TYPE to type
-                            )
-                        )
-                        .setConstraints(constraints)
-                        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                        .build()
-
                 manager.enqueueUniqueWork(
-                    "InstantPhotoBackupWork",
-                    ExistingWorkPolicy.REPLACE,
-                    instantBackupRequest
+                    INSTANT_BACKUP_WORK,
+                    ExistingWorkPolicy.KEEP,
+                    buildImmediateBackupRequest(type, forceRetry = true)
                 )
             }
 
-            // 2️⃣ Periodic backup with current preferences
+            // 2️⃣ Periodic backup with current preferences. The periodic run only
+            // schedules a drain batch (see PeriodicPhotoBackupWorker.KEY_TRIGGER_ONLY),
+            // so both entry points share a single serialised work chain.
             val periodicUploadWorkRequest =
                 PeriodicWorkRequestBuilder<PeriodicPhotoBackupWorker>(Duration.ofDays(repeatIntervalDays))
                     .setInputData(
-                        workDataOf(PeriodicPhotoBackupWorker.KEY_COMPRESSION_THRESHOLD to 1024 * 50L)
+                        workDataOf(
+                            PeriodicPhotoBackupWorker.KEY_COMPRESSION_THRESHOLD to 1024 * 50L,
+                            PeriodicPhotoBackupWorker.KEY_TRIGGER_ONLY to true
+                        )
                     )
                     .setConstraints(constraints)
                     .setInitialDelay(Duration.ofDays(1))
@@ -100,8 +118,22 @@ object WorkModule {
             )
         }
 
+        /**
+         * Appends another batch to the running backup chain. This is what makes
+         * uploads continue past MAX_BATCH_SIZE instead of stopping until the next
+         * manual tap / periodic run.
+         */
+        fun enqueueContinuation(type: String? = null) {
+            manager.enqueueUniqueWork(
+                INSTANT_BACKUP_WORK,
+                ExistingWorkPolicy.APPEND_OR_REPLACE,
+                buildImmediateBackupRequest(type, forceRetry = false)
+            )
+        }
+
         fun cancel() {
             manager.cancelUniqueWork(PERIODIC_PHOTO_BACKUP_WORK)
+            manager.cancelUniqueWork(INSTANT_BACKUP_WORK)
         }
     }
 
@@ -411,6 +443,7 @@ object WorkModule {
         .flowOn(Dispatchers.IO)
 
     const val PERIODIC_PHOTO_BACKUP_WORK = "PeriodicPhotoBackupWork"
+    const val INSTANT_BACKUP_WORK = "InstantPhotoBackupWork"
     const val SYNC_MEDIA_STORE_WORK = "SyncMediaStoreWork"
     const val RESTORE_ALL_PHOTOS_WORK = "RestoreAllPhotosWork"
     const val PERIODIC_DB_EXPORT_WORK = "PeriodicDbExportWork"

@@ -41,18 +41,19 @@ class InstantPhotoUploadWorker(
 
         // Recover stale IN_PROGRESS uploads from previous interrupted workers
         val uploadQueueDaoEarly = DbHolder.database.uploadQueueDao()
-        val staleCutoff = System.currentTimeMillis() - STALE_UPLOAD_TIMEOUT_MS
+        val now = System.currentTimeMillis()
+        val staleCutoff = now - STALE_UPLOAD_TIMEOUT_MS
         val recoveredStale = uploadQueueDaoEarly.failStaleInProgress(staleCutoff)
         if (recoveredStale > 0) {
             Log.w("PhotoUpload", "Recovered $recoveredStale stale interrupted uploads")
             com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Recovered $recoveredStale stale interrupted uploads")
         }
 
-        // Reset failed uploads that still have retries remaining
-        val resetFailed = uploadQueueDaoEarly.resetFailedToPending(MAX_RETRIES)
-        if (resetFailed > 0) {
-            Log.i("PhotoUpload", "Reset $resetFailed failed uploads for retry")
-            com.akslabs.cloudgallery.utils.DebugLogManager.i("PhotoUpload", "Reset $resetFailed failed uploads for retry")
+        // Photos left UPLOADING by a killed process must become retryable again.
+        val recoveredPhotos = DbHolder.database.photoDao().failStaleUploadingPhotos(staleCutoff, now)
+        if (recoveredPhotos > 0) {
+            Log.w("PhotoUpload", "Recovered $recoveredPhotos photos stuck in UPLOADING")
+            com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Recovered $recoveredPhotos photos stuck in UPLOADING")
         }
 
         val uploadBlock: suspend () -> Result = {
@@ -76,11 +77,24 @@ class InstantPhotoUploadWorker(
                             return@withContext Result.success()
                         }
 
-                        val activeEntry = uploadQueueDao.getActiveForPhoto(photo.localId)
-                        if (activeEntry != null) {
-                            Log.w("PhotoUpload", "Upload already queued for ${photo.localId}; not reporting success")
-                            com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Upload already queued for ${photo.localId}; retrying")
-                            return@withContext Result.retry()
+                        // Reuse the latest queue row so retryCount is preserved and a
+                        // photo cannot be retried forever with a fresh counter.
+                        val latestEntry = uploadQueueDao.getLatestForPhoto(photo.localId)
+                        when (latestEntry?.status) {
+                            "IN_PROGRESS" -> {
+                                Log.w("PhotoUpload", "Upload already in progress for ${photo.localId}; retrying later")
+                                com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Upload already in progress for ${photo.localId}; retrying later")
+                                return@withContext Result.retry()
+                            }
+                            "DONE" -> {
+                                photoDao.updateUploadStatus(photo.localId, "DONE", System.currentTimeMillis())
+                                return@withContext Result.success()
+                            }
+                            "CANCELLED" -> {
+                                // Explicit (user-triggered) retry: grant a fresh budget.
+                                Log.i("PhotoUpload", "Re-arming ${photo.localId} after previous retries were exhausted")
+                                uploadQueueDao.resetForRetry(latestEntry.id)
+                            }
                         }
 
                         val hash = photo.contentHash ?: ContentHasher.computeHash(appContext, photoUri)
@@ -94,11 +108,12 @@ class InstantPhotoUploadWorker(
                                 Log.d("PhotoUpload", "Dedup: content already in cloud (hash match)")
                                 photoDao.updateRemoteIdForLocalId(photo.localId, existing.remoteId)
                                 photoDao.updateUploadStatus(photo.localId, "DONE", System.currentTimeMillis())
+                                latestEntry?.let { uploadQueueDao.markDone(it.id) }
                                 return@withContext Result.success()
                             }
                         }
 
-                        val queueId = uploadQueueDao.insert(UploadQueue(
+                        val queueId = latestEntry?.id ?: uploadQueueDao.insert(UploadQueue(
                             localId = photo.localId,
                             pathUri = photo.pathUri,
                             contentHash = hash,
@@ -176,8 +191,10 @@ class InstantPhotoUploadWorker(
                             uploadQueueDao.markFailed(queueId, e.message)
                             val updatedQueue = uploadQueueDao.getById(queueId)
                             if (updatedQueue?.retryCount != null && updatedQueue.retryCount >= MAX_RETRIES) {
-                                Log.e("PhotoUpload", "Permanently cancelling ${photo.localId}: retries exhausted")
+                                Log.e("PhotoUpload", "Permanently parking ${photo.localId}: retries exhausted")
+                                com.akslabs.cloudgallery.utils.DebugLogManager.w("PhotoUpload", "Parking ${photo.localId}: retries exhausted after $MAX_RETRIES attempts")
                                 uploadQueueDao.markCancelled(queueId)
+                                photoDao.updateUploadStatus(photo.localId, "SKIPPED", System.currentTimeMillis())
                                 return@withContext Result.failure()
                             }
                             throw e

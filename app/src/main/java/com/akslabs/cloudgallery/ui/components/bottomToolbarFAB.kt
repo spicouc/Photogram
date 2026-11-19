@@ -163,7 +163,7 @@ fun BottomToolbarFAB(
                                     try {
                                         workManager.cancelAllWorkByTag("manual_backup")
                                         workManager.cancelAllWorkByTag("instant_upload")
-                                        workManager.cancelUniqueWork("InstantPhotoBackupWork")
+                                        workManager.cancelUniqueWork(WorkModule.INSTANT_BACKUP_WORK)
                                         workManager.cancelUniqueWork(WorkModule.PERIODIC_PHOTO_BACKUP_WORK)
                                         
                                         val isAutoBackupEnabled = Preferences.getBoolean(Preferences.isAutoBackupEnabledKey, false)

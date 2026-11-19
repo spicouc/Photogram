@@ -47,25 +47,41 @@ class PeriodicPhotoBackupWorker(
 
     override suspend fun doWork(): Result {
         val uploadType = params.inputData.getString(KEY_UPLOAD_TYPE)
+
+        // The periodic entry point only schedules a batch in the shared drain chain.
+        // Actual uploads always run serialised under INSTANT_BACKUP_WORK.
+        if (params.inputData.getBoolean(KEY_TRIGGER_ONLY, false)) {
+            WorkModule.PeriodicBackup.enqueueContinuation(uploadType)
+            return Result.success(workDataOf())
+        }
+
         val deviceId = Preferences.getOrCreateDeviceId()
         val photoDao = DbHolder.database.photoDao()
         val remotePhotoDao = DbHolder.database.remotePhotoDao()
         val uploadQueueDao = DbHolder.database.uploadQueueDao()
 
         // Recover stale IN_PROGRESS uploads from previous interrupted workers
-        val staleCutoff = System.currentTimeMillis() - STALE_UPLOAD_TIMEOUT_MS
+        val now = System.currentTimeMillis()
+        val staleCutoff = now - STALE_UPLOAD_TIMEOUT_MS
         val recoveredStale = uploadQueueDao.failStaleInProgress(staleCutoff)
         if (recoveredStale > 0) {
             Log.w("PeriodicBackup", "Recovered $recoveredStale stale interrupted uploads")
+            com.akslabs.cloudgallery.utils.DebugLogManager.w("PeriodicBackup", "Recovered $recoveredStale stale interrupted uploads")
         }
 
-        // Reset failed uploads that still have retries remaining
-        val resetFailed = uploadQueueDao.resetFailedToPending(MAX_RETRIES)
-        if (resetFailed > 0) {
-            Log.i("PeriodicBackup", "Reset $resetFailed failed uploads for retry")
+        // Photos left in UPLOADING by a killed process are invisible to the pending
+        // query; put them back to FAILED unless a live queue entry still owns them.
+        val recoveredPhotos = photoDao.failStaleUploadingPhotos(staleCutoff, now)
+        if (recoveredPhotos > 0) {
+            Log.w("PeriodicBackup", "Recovered $recoveredPhotos photos stuck in UPLOADING")
+            com.akslabs.cloudgallery.utils.DebugLogManager.w("PeriodicBackup", "Recovered $recoveredPhotos photos stuck in UPLOADING")
         }
 
-        val allPending = photoDao.getAllPendingUpload()
+        // Failed photos wait for a cool-down before being retried so they cannot
+        // starve the rest of the backlog. An explicit user enqueue bypasses it.
+        val forceRetry = params.inputData.getBoolean(KEY_FORCE_RETRY, false)
+        val retryCutoff = if (forceRetry) Long.MAX_VALUE else now - RETRY_COOLDOWN_MS
+        val allPending = photoDao.getAllPendingUpload(retryCutoff)
         val excludedBucketNames = Preferences.getExcludedBucketNames()
         val syncMode = Preferences.getSyncMode()
         val newOnlyTimestamp = Preferences.getSyncNewOnlyTimestamp()
@@ -115,10 +131,22 @@ class PeriodicPhotoBackupWorker(
 
                 var successCount = 0
                 var failedCount = 0
+                var processedCount = 0
+                var timedOut = false
+                val runStartedAt = System.currentTimeMillis()
 
                 val parallelism = if (isSyncImagePreviewEnabled()) 1 else PARALLELISM
                 val chunks = imageList.chunked(parallelism)
                 for ((chunkIndex, chunk) in chunks.withIndex()) {
+                    // Stay below WorkManager's 10 minute execution limit: hand the
+                    // remaining photos to a fresh chained worker instead of being
+                    // killed mid-batch (which leaves rows IN_PROGRESS).
+                    if (System.currentTimeMillis() - runStartedAt >= MAX_RUN_DURATION_MS) {
+                        timedOut = true
+                        Log.w("PeriodicBackup", "Time budget reached after $processedCount/${imageList.size}; chaining next batch")
+                        break
+                    }
+
                     val results = coroutineScope {
                         chunk.mapIndexed { indexInChunk, photo ->
                             async(Dispatchers.IO) {
@@ -140,6 +168,7 @@ class PeriodicPhotoBackupWorker(
                     results.forEach { success ->
                         if (success) successCount++ else failedCount++
                     }
+                    processedCount += chunk.size
 
                     val processed = minOf((chunkIndex + 1) * parallelism, imageList.size)
                     setProgress(
@@ -150,19 +179,28 @@ class PeriodicPhotoBackupWorker(
                         )
                     )
 
-                    if (chunkIndex < chunks.size - 1) {
+                    if (chunkIndex < chunks.size - 1 && !timedOut) {
                         delay(DELAY_BETWEEN_CHUNKS_MS)
                     }
                 }
 
-                Log.d("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed")
-                com.akslabs.cloudgallery.utils.DebugLogManager.i("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed")
-                // Only retry if there were actual failures (not just skipped/deduped)
-                if (failedCount > 0) {
-                    com.akslabs.cloudgallery.utils.DebugLogManager.w("PeriodicBackup", "Batch had failures - will retry")
+                val moreWorkLeft = timedOut ||
+                    processedCount < imageList.size ||
+                    pendingPhotos.size > imageList.size
+
+                Log.d("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed, moreWorkLeft=$moreWorkLeft")
+                com.akslabs.cloudgallery.utils.DebugLogManager.i("PeriodicBackup", "Batch complete: $successCount succeeded, $failedCount failed, moreWorkLeft=$moreWorkLeft")
+
+                if (failedCount > 0 && successCount == 0) {
+                    // No progress at all (auth/network outage): let WorkManager back off.
+                    com.akslabs.cloudgallery.utils.DebugLogManager.w("PeriodicBackup", "No progress in batch - will retry")
                     Result.retry()
                 } else {
-                    com.akslabs.cloudgallery.utils.DebugLogManager.i("PeriodicBackup", "Batch complete - all succeeded")
+                    // Keep draining: append another batch while photos remain.
+                    if (!isStopped && moreWorkLeft) {
+                        com.akslabs.cloudgallery.utils.DebugLogManager.i("PeriodicBackup", "Chaining next batch (remaining ≈ ${pendingPhotos.size - processedCount})")
+                        WorkModule.PeriodicBackup.enqueueContinuation(uploadType)
+                    }
                     Result.success(workDataOf())
                 }
             } catch (e: Exception) {
@@ -192,12 +230,29 @@ class PeriodicPhotoBackupWorker(
                 Log.d("PeriodicBackup", "Skipping ${photo.localId}: already uploaded")
                 return true
             }
+            if (current.uploadStatus == "SKIPPED") {
+                Log.d("PeriodicBackup", "Skipping ${photo.localId}: parked after repeated failures")
+                return true
+            }
 
-            // 2. Check upload queue for active entry from another worker
-            val activeQueueEntry = uploadQueueDao.getActiveForPhoto(photo.localId)
-            if (activeQueueEntry != null) {
-                Log.w("PeriodicBackup", "Upload still queued for ${photo.localId}; not counting as completed")
-                return false
+            // 2. Inspect the latest queue row for this photo. Reusing it (instead of
+            // inserting a new row per attempt) preserves retryCount, so a photo that
+            // keeps failing is eventually parked instead of retried forever.
+            val latestQueueEntry = uploadQueueDao.getLatestForPhoto(photo.localId)
+            when (latestQueueEntry?.status) {
+                "IN_PROGRESS" -> {
+                    Log.w("PeriodicBackup", "Upload still in progress for ${photo.localId}; skipping")
+                    return false
+                }
+                "DONE" -> {
+                    photoDao.updateUploadStatus(current.localId, "DONE", System.currentTimeMillis())
+                    return true
+                }
+                "CANCELLED" -> {
+                    Log.w("PeriodicBackup", "Parking ${photo.localId}: automatic retries exhausted")
+                    photoDao.updateUploadStatus(current.localId, "SKIPPED", System.currentTimeMillis())
+                    return true
+                }
             }
 
             // 3. Compute content hash if missing
@@ -213,12 +268,13 @@ class PeriodicPhotoBackupWorker(
                     Log.d("PeriodicBackup", "Dedup: ${photo.localId} already in cloud (hash match)")
                     photoDao.updateRemoteIdForLocalId(current.localId, existing.remoteId)
                     photoDao.updateUploadStatus(current.localId, "DONE", System.currentTimeMillis())
+                    latestQueueEntry?.let { uploadQueueDao.markDone(it.id) }
                     return true
                 }
             }
 
-            // 5. Create queue entry
-            val queueId = uploadQueueDao.insert(
+            // 5. Reuse the existing row when possible, otherwise create one
+            val queueId = latestQueueEntry?.id ?: uploadQueueDao.insert(
                 UploadQueue(
                     localId = current.localId,
                     pathUri = current.pathUri,
@@ -337,13 +393,20 @@ class PeriodicPhotoBackupWorker(
             } catch (e: Exception) {
                 Log.e("PeriodicBackup", "Upload failed for ${photo.localId}: ${e.message}" +
                     if (topicName != null) " (topic='$topicName')" else "")
+                com.akslabs.cloudgallery.utils.DebugLogManager.w(
+                    "PeriodicBackup",
+                    "Upload failed for ${photo.localId}: ${e.message}"
+                )
                 photoDao.updateUploadStatus(current.localId, "FAILED", System.currentTimeMillis())
                 uploadQueueDao.markFailed(queueId, e.message)
-                // Check retry count — if exceeded, permanently cancel to avoid infinite loop
+                // Check retry count — if exceeded, park the photo so it stops
+                // consuming batch slots on every run.
                 val updatedQueue = uploadQueueDao.getById(queueId)
                 if (updatedQueue?.retryCount != null && updatedQueue.retryCount >= MAX_RETRIES) {
-                    Log.e("PeriodicBackup", "Permanently cancelling ${photo.localId}: retries exhausted ($MAX_RETRIES)")
+                    Log.e("PeriodicBackup", "Permanently parking ${photo.localId}: retries exhausted ($MAX_RETRIES)")
+                    com.akslabs.cloudgallery.utils.DebugLogManager.w("PeriodicBackup", "Parking ${photo.localId}: retries exhausted after $MAX_RETRIES attempts")
                     uploadQueueDao.markCancelled(queueId)
+                    photoDao.updateUploadStatus(current.localId, "SKIPPED", System.currentTimeMillis())
                 }
                 false
             } finally {
@@ -373,12 +436,16 @@ class PeriodicPhotoBackupWorker(
         const val KEY_PROGRESS_MAX = "progress_max"
         const val KEY_CURRENT_FILE_URI = "current_file_uri"
         const val KEY_UPLOAD_TYPE = "upload_type"
+        const val KEY_TRIGGER_ONLY = "trigger_only"
+        const val KEY_FORCE_RETRY = "force_retry"
         const val KEY_TOTAL_DONE = "total_done"
         const val KEY_TOTAL_PHOTOS = "total_photos"
         const val MAX_BATCH_SIZE = 50
         const val PARALLELISM = 1
         const val DELAY_BETWEEN_CHUNKS_MS = 1500L
-        const val MAX_RETRIES = 3
+        const val MAX_RETRIES = 5
         const val STALE_UPLOAD_TIMEOUT_MS = 10 * 60 * 1000L // 10 minutes
+        const val RETRY_COOLDOWN_MS = 15 * 60 * 1000L // failed photos rest 15 min before retry
+        const val MAX_RUN_DURATION_MS = 8 * 60 * 1000L // stay under WorkManager's 10 min limit
     }
 }
